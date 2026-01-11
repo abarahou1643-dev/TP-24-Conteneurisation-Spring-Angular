@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./Smart_Home_back
+      dockerfile: Dockerfile
+    container_name: smarthouse-backend
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/smart_house?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - mysql
+
+  frontend:
+    build:
+      context: ./smartHome-front
+      dockerfile: Dockerfile
+    container_name: smarthouse-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+  mysql:
+    image: mysql:8
+    container_name: smarthouse-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smart_house
+    ports:
+      - "3307:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: smarthouse-phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
